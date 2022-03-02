@@ -32,33 +32,45 @@ int main(int argc, char *argv[]) {
 
    //for loop to put values in arguments into lab03.csv
    for(int i = 2; i < argc; i++) {
+      char *argument = argv[i];
+      char name[50] = ""; //value to hold name
+      char quantity[50] = ""; //value to hold quantity
+      int j = 0;
 
-      //making this in case the original value needs to be displayed for string overflow error
-      char overflow[50];
-      strcpy(overflow, argv[i]);
+      //get the name of product
+      while(argument[j] != ' ') {
+         strncat(name, &argument[j], 1);
+         j++;
+      }
 
-      //get first value (name of object) inside the argument, print error if more than 15 characters
-      argv[i] = strtok( argv[i], " " );
-      if( strlen( argv[i] ) > 15 ) {
-         printf( "string overflow: %s\n", overflow );
+      //check if name is longer than 15 characters, terminate program if so
+      if( strlen( name ) > 15 ) {
+         printf( "string overflow: %s\n", name );
          return -1;
       }
 
-      object->name = argv[i] ; //put value into 'name' data member of struct
+      j++; //skip the space
 
-      //get second value (quantity of object) inside the argument, print error if not a number
-      argv[i] = strtok( NULL, " " );
-      for( int j = 0; j < strlen(argv[i]); j++ ) {
-         if( !( argv[i][j] >= '0' && argv[i][j] <= '9' )) {
-            printf( "not a number: %s", argv[i] );
-            return -1;
-         }
+      //get the quantity of product
+      while(argument[j] != '\0') {
+         strncat(quantity, &argument[j], 1);
+         j++;
       }
 
-      object->quantity = argv[i]; //put value into 'quantity' data member of struct
+      //check that quantity does not contain non-numbers, terminate program if so
+      for(int n = 0; n < strlen(quantity); n++) {
+            if( !( quantity[n] >= '0' && quantity[n] <= '9' )) {
+               printf( "not a number: %s", quantity );
+               return -1;
+            }
+      }
 
-      fprintf( file, "%s,%s\n", object->name, object->quantity ); //finally, populate .csv file with values
-   }
+      //put acquired values into struct
+      object->quantity = quantity;
+      object->name = name;
+
+      fprintf( file, "%s,%s\n", object->name, object->quantity ); //finally, populate .csv file with struct values
+      }
 
    fclose(file); //close file
 
